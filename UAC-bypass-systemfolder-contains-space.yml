@@ -1,0 +1,35 @@
+title: UAC Bypass - system folder contains space
+status: experimental
+description: |
+	Detects loading of files in a directory masquerading as a system folder using space characters.
+	This can be a sign of DLL hijacking against known Windows binaries.
+references:
+	- https://ren-zxcyq.github.io
+author: ren-zxcyq
+date: 2025-03-23
+modified: 2025-03-23
+tags:
+	- attack.uac-bypass
+	- attack.T1548.002
+logsource:
+	category: image_load
+	product: windows
+detection:
+	selection_dir_c:
+		ImageLoaded|startswith:
+			- 'C:\'
+	selection_masq:
+		ImageLoaded|contains:
+			- '\ '
+			- ' \'
+	selection_dir_masq:
+		ImageLoaded|contains:
+			- 'Program Files'
+			- 'Program Files (x86)'
+			- 'Windows'
+			- 'system32'
+			- 'SysWOW64'
+	condition: selection_dir_c and 1 of selection_masq and 1 of selection_dir_masq
+falsepositives:
+	- Unknown
+level: medium
